@@ -26,8 +26,8 @@
 
         "using strict";
 
-        let renderer, scene, camera, cameraControl, mesh, mesh1, mesh2, mesh3, mesh4, mesh5, mesh6, mesh7, mesh8, mesh9, stats;
-
+        let renderer, scene, camera, cameraControl, mesh0, mesh1, mesh2, mesh3, mesh4, mesh5, stats;
+ 
 function init() {
     // RENDERER
     renderer = new THREE.WebGLRenderer({antialias: true});
@@ -49,32 +49,31 @@ function init() {
 
 	let isVisible = true;
 
-    //MESH MODELS
-    //Cone
-    let geometry0 = new THREE.ConeGeometry();
-    let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-    let mesh0 = new THREE.Mesh(geometry0, material0);
+	//MESH MODELS
+	//Cone
+	let geometry0 = new THREE.ConeGeometry();
+	let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+	mesh0 = new THREE.Mesh(geometry0, material0);
 
-    let geometry1 = new THREE.BoxGeometry();
-    let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+	let geometry1 = new THREE.BoxGeometry();
+	let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
 	mesh1 = new THREE.Mesh(geometry1, material1);
-    mesh1.position.set( 14, 2, 2 );
+	mesh1.position.set( 14, 2, 2 );
 
-    let geometry2 = new THREE.SphereGeometry(3, 50, 50);
-    let material2 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-    mesh2 = new THREE.Mesh(geometry2, material2);
-    mesh2.position.set(7, 2, 2 );
+	let geometry2 = new THREE.SphereGeometry(3, 50, 50);
+	let material2 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+	const mesh2 = new THREE.Mesh(geometry2, material2);
+	mesh2.position.set(7, 2, 2 );
 
 	let geometry3 = new THREE.ConeGeometry( 3, 10, 32 );
-    let material3 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-    mesh3 = new THREE.Mesh( geometry3, material3 );
-    mesh3.position.set( -7 , 2, 2 );
+	let material3 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+	const mesh3 = new THREE.Mesh(geometry3, material3 );
+	mesh3.position.set( -7 , 2, 2 );
 
 	const geometry4 = new THREE.SphereGeometry(3, 50, 50);
-    let material4 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-    mesh4 = new THREE.Mesh( geometry4, material4 );
-    mesh4.position.set( -14 , 2, 2 );
-
+	let material4 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+	const mesh4 = new THREE.Mesh(geometry4, material4 );
+	mesh4.position.set( -14 , 2, 2 );
 
     // SCENE GRAPH
 	const group = new THREE.Group();
@@ -83,74 +82,21 @@ function init() {
 	group.add(mesh2);
 	group.add(mesh3);
 	group.add(mesh4);
+	
+	scene.add(group);
     // GUI
     let gui = new dat.GUI();
 
-    // model
-    let listColors = ["White", "Red", "Blue"];
-    let model = {
-        rotY: mesh.rotation.y * 180 / Math.PI,
-        posHome: function() {
-            mesh.position.x = 0;
-            model.rotY = 0;
-            mesh.rotation.y = model.rotY;
-        },
-        listColors,
-        defaultItem: listColors[0],
-        colorPalette: [255, 255, 255],
-    }
-    // view & controller
-
     // General menu
     let generalMenu = gui.addFolder("General Menu");
-
 
     //cambiar figura
     let changeAppearingShape = gui.add(mesh0, "visible").name( "Q SE vea ");
     let changeAppearingShape1 = gui.add(mesh1, "visible").name( "Q SE vea 1");
     let changeAppearingShape2 = gui.add(mesh2, "visible").name( "Q SE vea 2");
-	  let changeAppearingShape3 = gui.add(mesh3, "visible").name( "Q SE vea 3");
+	let changeAppearingShape3 = gui.add(mesh3, "visible").name( "Q SE vea 3");
 	let changeAppearingShape4 = gui.add(mesh4, "visible").name( "Q SE vea 4");
     generalMenu.open();
-
-    // Position Menu
-    let posMenu = gui.addFolder("Model's Position Menu");
-    //posMenu.open();
-    //Model Position
-    let sliderPosX = posMenu.add(mesh.position, "x").min(-5).max(5).step(0.5).name("X").listen().onChange(function(value) {
-      console.log(mesh)
-        mesh.geometry.attributes.position.needsUpdate = true;
-    });
-    // Button Position Home
-    let btnPosHome = posMenu.add(model, "posHome").name("HOME");
-
-    // Rotation Menu
-    let rotMenu = gui.addFolder("Model's Rotation Menu");
-    // Model Orientation
-    let sliderRotY = rotMenu.add(model, "rotY").min(-180).max(180).step(5).name("Y (deg)").listen().onChange(function(value) {
-        mesh.rotation.y = value * Math.PI / 180;
-    });
-
-    // Model's Appearance Menu
-    let appearMenu = gui.addFolder("Model's Appeareance Menu");
-    // Model Draw Mode
-    let chbWireframe = appearMenu.add(mesh.material0, "wireframe").setValue(true).name("Wireframe").onChange(function(value) {
-
-    });
-    let listColor = appearMenu.add(model, "defaultItem", model.listColors).name("Color List").onChange(function(item) {
-        mesh.material0.color = new THREE.Color(item.toLowerCase());
-        model.colorPalette = [mesh.material0.color.r * 255, mesh.material0.color.g * 255, mesh.material0.color.b * 255];
-    });
-    let colorPalette = appearMenu.addColor(model, "colorPalette").name("Color Palette").listen().onChange(function(color) {
-        mesh.material0.color = new THREE.Color(color[0]/255, color[1]/255, color[2]/255);
-    });
-
-    // Model's Background
-    let changeColorBack = gui.addFolder("Model's Background Color");
-    let colorBackground = changeColorBack.addColor(model, "colorPalette").name("Color Palette").listen().onChange(function(color) {
-        renderer.setClearColor(new THREE.Color(color[0]/255, color[1]/255, color[2]/255));
-    });
-
 
     gui.close();
 
