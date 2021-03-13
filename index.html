@@ -16,136 +16,234 @@
     <title>Document</title>
 </head>
 <body>
-    <script type="text/javascript"src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js">
-    </script>
-    <script type="module">
-        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
-        import {OrbitControls} from "https://unpkg.com/three@0.119.0/examples/jsm/controls/OrbitControls.js";
-        import Stats from "https://unpkg.com/three/examples/jsm/libs/stats.module.js";
-        import dat from "https://unpkg.com/three@0.126.1/examples/jsm/libs/dat.gui.module.js";
+<script type="text/javascript"src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js">
+</script>
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+  import {OrbitControls} from "https://unpkg.com/three@0.119.0/examples/jsm/controls/OrbitControls.js";
+  import Stats from "https://unpkg.com/three/examples/jsm/libs/stats.module.js";
+  import dat from "https://unpkg.com/three@0.126.1/examples/jsm/libs/dat.gui.module.js";
 
-        "using strict";
+  "using strict";
 
-        let renderer, scene, camera, cameraControl, mesh0, mesh1, mesh2, mesh3, mesh4, mesh5, stats;
- 
-
-function init() {
-    // RENDERER
-    renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(new THREE.Color(0.2, 0.24, 0.30));
-    document.body.appendChild(renderer.domElement);
-
-    // SCENE
-    scene = new THREE.Scene();
-
-    // CAMERA
-    let fov = 60;
-    let aspect = window.innerWidth / window.innerHeight;
-    let near = 0.1;
-    let far = 10000;
-    camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.set(0, 0, 3);
-    cameraControl = new OrbitControls(camera, renderer.domElement);
-
-	let isVisible = true;
-
-	//MESH MODELS
-	//Cone
-	let geometry0 = new THREE.ConeGeometry();
-	let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-	mesh0 = new THREE.Mesh(geometry0, material0);
-
-	let geometry1 = new THREE.BoxGeometry();
-	let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-	mesh1 = new THREE.Mesh(geometry1, material1);
-	mesh1.position.set( 14, 2, 2 );
-
-	let geometry2 = new THREE.SphereGeometry(3, 50, 50);
-	let material2 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-	const mesh2 = new THREE.Mesh(geometry2, material2);
-	mesh2.position.set(7, 2, 2 );
-
-	let geometry3 = new THREE.ConeGeometry( 3, 10, 32 );
-	let material3 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-	const mesh3 = new THREE.Mesh(geometry3, material3 );
-	mesh3.position.set( -7 , 2, 2 );
-
-	const geometry4 = new THREE.SphereGeometry(3, 50, 50);
-	let material4 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-	const mesh4 = new THREE.Mesh(geometry4, material4 );
-	mesh4.position.set( -14 , 2, 2 );
-
-    // SCENE GRAPH
-	const group = new THREE.Group();
-	group.add(mesh0);
-	group.add(mesh1);
-	group.add(mesh2);
-	group.add(mesh3);
-	group.add(mesh4);
-
-	scene.add(group);
-    // GUI
-    let gui = new dat.GUI();
-
-    // General menu
-    let generalMenu = gui.addFolder("General Menu");
-	
-	let listShapes = ["Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5"];
-
-	let model = {
-		listShapes,
-		defaultShape: listShapes[0]
+  let renderer, scene, camera, cameraControl, mesh0, mesh1, mesh2, mesh3, mesh4, mesh5, stats;
+  
+ 	function startMenu(cubeMenu, mesh){
+		let listColors = ["White", "Red", "Blue"];
+		let model = {
+			rotY: mesh.rotation.y * 180 / Math.PI,
+			rotX: mesh.rotation.x * 180 / Math.PI,
+			rotZ: mesh.rotation.z * 180 / Math.PI,
+			posHome: function() {
+				mesh.position.x = 0;
+				model.rotY = 0;
+				mesh.rotation.y = model.rotY;
+				mesh.rotation.x = model.rotY;
+				mesh.rotation.z = model.rotZ;
+			},
+			listColors,
+			defaultItem: listColors[0],
+			colorPalette: [255, 255, 255]
+		}
 	}
 
-    //cambiar figura
-    let changeAppearingShape0 = gui.add(mesh0, "visible").name( "Figure 1");
-    let changeAppearingShape1 = gui.add(mesh1, "visible").name( "Figure 2");
-    let changeAppearingShape2 = gui.add(mesh2, "visible").name( "Figure 3");
-    let changeAppearingShape3 = gui.add(mesh3, "visible").name( "Figure 4");
-    let changeAppearingShape4 = gui.add(mesh4, "visible").name( "Figure 5");
-    generalMenu.open();
+	function shapeMenu(shapeMenu, mesh, startPos){
+		// model
 
-	let listShape = generalMenu.add(model, "defaultShape", model.listShapes).name("Shape List").onChange(function(item) {
-		if(item == "Figure 1"){
-			mesh0.visible = false;
+		let listColors = ["White", "Red", "Blue"];
+		let model = {
+			rotY: mesh.rotation.y * 180 / Math.PI,
+			rotX: mesh.rotation.x * 180 / Math.PI,
+			rotZ: mesh.rotation.z * 180 / Math.PI,
+			posHome: function() {
+				mesh.position.x = startPos;
+				model.rotY = 0;
+				mesh.rotation.y = model.rotY;
+				mesh.rotation.x = model.rotY;
+				mesh.rotation.z = model.rotZ;
+			},
+			listColors,
+			defaultItem: listColors[0],
+			colorPalette: [255, 255, 255]
 		}
+		// view & controller
+
+		// General menu
+		// let cubeMenu = gui.addFolder("Cube Controls")
+		let generalMenu = shapeMenu.addFolder("General Menu");
+		// TextField Model Name
+		let tfMeshName = generalMenu.add(mesh, "name").name("Model's Name").onChange(function(value) {
+
+		}).onFinishChange(function(value) {
+			console.log(mesh.name);
+		});
+		generalMenu.open();
+
+		// Position Menu
+		let posMenu = shapeMenu.addFolder("Model's Position Menu");
+		//posMenu.open();
+		//Model Position
+		let sliderPosX = posMenu.add(mesh.position, "x").min(startPos-5).max(startPos+5).step(0.5).name("X").listen().onChange(function(value) {
+
+		});
+
+		let sliderPosY = posMenu.add(mesh.position, "y").min(-5).max(5).step(0.5).name("Y").listen().onChange(function(value) {
+
+		});
+
+		let sliderPosZ = posMenu.add(mesh.position, "z").min(-5).max(5).step(0.5).name("Z").listen().onChange(function(value) {
+
+		});
+
+
+		// Button Position Home
+		let btnPosHome = posMenu.add(model, "posHome").name("HOME");
+
+		// Rotation Menu
+		let rotMenu = shapeMenu.addFolder("Model's Rotation Menu");
+		// Model Orientation
+		let sliderRotY = rotMenu.add(model, "rotY").min(-180).max(180).step(5).name("Y (deg)").listen().onChange(function(value) {
+			mesh.rotation.y = value * Math.PI / 180;
+		});
+
+		let sliderRotX = rotMenu.add(model, "rotX").min(-180).max(180).step(5).name("X (deg)").listen().onChange(function(value) {
+			mesh.rotation.x = value * Math.PI / 180;
+		});
+
+		let sliderRotZ = rotMenu.add(model, "rotZ").min(-180).max(180).step(5).name("Z (deg)").listen().onChange(function(value) {
+			mesh.rotation.z = value * Math.PI / 180;
+		});
+
+		// Model's Appearance Menu
+		let appearMenu = shapeMenu.addFolder("Model's Appeareance Menu");
+		// Model Draw Mode
+		let chbWireframe = appearMenu.add(mesh.material, "wireframe").setValue(true).name("Wireframe").onChange(function(value) {
+			
+		});
+		let listColor = appearMenu.add(model, "defaultItem", model.listColors).name("Color List").onChange(function(item) {
+			mesh.material.color = new THREE.Color(item.toLowerCase());
+			model.colorPalette = [mesh.material.color.r * 255, mesh.material.color.g * 255, mesh.material.color.b * 255];
+		});
+		let colorPalette = appearMenu.addColor(model, "colorPalette").name("Color Palette").listen().onChange(function(color) {
+			mesh.material.color = new THREE.Color(color[0]/255, color[1]/255, color[2]/255);
+		});
+	}
+
+	function init() {
+		// RENDERER
+		renderer = new THREE.WebGLRenderer({antialias: true});
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setClearColor(new THREE.Color(0.2, 0.24, 0.30));
+		document.body.appendChild(renderer.domElement);
+
+		// SCENE
+		scene = new THREE.Scene();
+
+		// CAMERA
+		let fov = 60;
+		let aspect = window.innerWidth / window.innerHeight;
+		let near = 0.1;
+		let far = 10000;
+		camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+		camera.position.set(0, 0, 3);
+		cameraControl = new OrbitControls(camera, renderer.domElement);
+
+		let isVisible = true;
+
+		//MESH MODELS
+		//Cone
+		let geometry0 = new THREE.ConeGeometry();
+		let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		mesh0 = new THREE.Mesh(geometry0, material0);
+
+		let geometry1 = new THREE.BoxGeometry();
+		let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		mesh1 = new THREE.Mesh(geometry1, material1);
+		mesh1.position.set( 14, 2, 2 );
+
+		let geometry2 = new THREE.SphereGeometry(3, 50, 50);
+		let material2 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		const mesh2 = new THREE.Mesh(geometry2, material2);
+		mesh2.position.set(7, 2, 2 );
+
+		let geometry3 = new THREE.ConeGeometry( 3, 10, 32 );
+		let material3 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		const mesh3 = new THREE.Mesh(geometry3, material3 );
+		mesh3.position.set( -7 , 2, 2 );
+
+		const geometry4 = new THREE.SphereGeometry(3, 50, 50);
+		let material4 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		const mesh4 = new THREE.Mesh(geometry4, material4 );
+		mesh4.position.set( -14 , 2, 2 );
+
+		// SCENE GRAPH
+		const group = new THREE.Group();
+		group.add(mesh0);
+		group.add(mesh1);
+		group.add(mesh2);
+		group.add(mesh3);
+		group.add(mesh4);
+
+		scene.add(group);
+		// GUI
+		let gui = new dat.GUI();
+    	let generalMenu = gui.addFolder("General Menu");
+		
+		let listShapes = ["Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5"];
+
+		let model = {
+			listShapes,
+			defaultShape: listShapes[0]
+		}
+
+		//cambiar figura
+		let changeAppearingShape0 = gui.add(mesh0, "visible").name( "Figure 1");
+		let changeAppearingShape1 = gui.add(mesh1, "visible").name( "Figure 2");
+		let changeAppearingShape2 = gui.add(mesh2, "visible").name( "Figure 3");
+		let changeAppearingShape3 = gui.add(mesh3, "visible").name( "Figure 4");
+		let changeAppearingShape4 = gui.add(mesh4, "visible").name( "Figure 5");
+		generalMenu.open();
+
+		let listShape = generalMenu.add(model, "defaultShape", model.listShapes).name("Shape List").onChange(function(item) {
+			if(item == "Figure 1"){
+				shapeMenu(generalMenu, mesh0, 0);
+			}
+		});
+
+
+		gui.close();
+
+		// STATS
+		stats = new Stats();
+		stats.showPanel(0);
+		document.body.appendChild(stats.dom);
+
+		// RENDER LOOP
+		renderLoop();
+	}
+
+	function renderLoop() {
+		stats.begin();
+		renderer.render(scene, camera); // DRAW SCENE
+		updateScene();
+		//scene.add(mesh)
+		stats.end();
+		stats.update();
+		requestAnimationFrame(renderLoop);
+	}
+
+	function updateScene() {
+
+	}
+
+	// EVENT LISTENERS & HANDLERS
+	document.addEventListener("DOMContentLoaded", init);
+
+	window.addEventListener("resize", function() {
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
 	});
-
-
-    gui.close();
-
-    // STATS
-    stats = new Stats();
-    stats.showPanel(0);
-    document.body.appendChild(stats.dom);
-
-    // RENDER LOOP
-    renderLoop();
-}
-
-function renderLoop() {
-    stats.begin();
-    renderer.render(scene, camera); // DRAW SCENE
-    updateScene();
-    //scene.add(mesh)
-    stats.end();
-    stats.update();
-    requestAnimationFrame(renderLoop);
-}
-
-function updateScene() {
-
-}
-
-// EVENT LISTENERS & HANDLERS
-document.addEventListener("DOMContentLoaded", init);
-
-window.addEventListener("resize", function() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-});
     </script>
 </body>
 </html>
