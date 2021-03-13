@@ -47,6 +47,7 @@ function init() {
     camera.position.set(0, 0, 3);
     cameraControl = new OrbitControls(camera, renderer.domElement);
 
+	let isVisible = true;
 
     //MESH MODELS
     //Cone
@@ -55,18 +56,17 @@ function init() {
     let mesh = new THREE.Mesh(geometryCone, material);
 
     let geometry1 = new THREE.BoxGeometry();
-      mesh1 = new THREE.Mesh(geometry1, material);
-      mesh1.position.x = 3;
-
+	mesh1 = new THREE.Mesh(geometry1, material);
+    mesh1.position.set( 0, 0, 0 );
 
     let geometry2 = new THREE.SphereGeometry();
     mesh2 = new THREE.Mesh(geometry2, material);
-    mesh2.position.x = -3;
+    mesh2.position.set( 7 , 2, 2 );
 
     // SCENE GRAPH
-    scene.add(mesh);
-
-
+	const group = new THREE.Group();
+    group.add(mesh);
+	scene.add(group);
     // GUI
     let gui = new dat.GUI();
 
@@ -104,38 +104,23 @@ function init() {
         //Cambio de figuras
         if (item.toLowerCase() == "cone") {
           mesh.geometry = (geometryCone);
-          scene.remove(mesh);
-           scene.add(mesh)
+          group.remove(mesh);
+		  group.add(mesh)
         }
         if (item.toLowerCase() == "cube") {
-        scene.remove(mesh);
+        group.remove(mesh);
         mesh.geometry = (geometryCube);
-        scene.add(mesh)
+        group.add(mesh)
         }
         if (item.toLowerCase() == "sphere") {
-         scene.remove(mesh);
+         group.remove(mesh);
          mesh.geometry = (geometrySphere);
-         scene.add(mesh);
+         group.add(mesh);
         }
 
     });
 
-    let changeAppearingShape = gui.add(mesh.material, "wireframe").setValue(true).name("Shape 1").onChange(function(value) {
-      if (value) {
-      scene.add(geometry1);
-      } else {
-      scene.remove(geometry1);
-      }
-      console.log(value)
-    });
-
-    let changeAppearingShape2 = gui.add(mesh.material, "wireframe").setValue(true).name("Shape 2").onChange(function(value) {
-      if (value) {
-      scene.add(geometry2);
-      } else {
-      scene.remove(geometry2);
-      }
-    });
+    let changeAppearingShape = gui.add(mesh, "visible").name( "Q SE vea ");
 
     generalMenu.open();
 
