@@ -26,7 +26,7 @@
 
         "using strict";
 
-        let renderer, scene, camera, cameraControl, mesh, mesh1, mesh2, stats;
+        let renderer, scene, camera, cameraControl, mesh, mesh1, mesh2, mesh3, mesh4, mesh5, mesh6, mesh7, mesh8, mesh9, stats;
 
 function init() {
     // RENDERER
@@ -51,37 +51,38 @@ function init() {
 
     //MESH MODELS
     //Cone
-    let geometryCone = new THREE.ConeGeometry();
-    let material = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-    let mesh = new THREE.Mesh(geometryCone, material);
+    let geometry0 = new THREE.ConeGeometry();
+    let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+    let mesh0 = new THREE.Mesh(geometry0, material0);
 
     let geometry1 = new THREE.BoxGeometry();
-	mesh1 = new THREE.Mesh(geometry1, material);
+    let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+	mesh1 = new THREE.Mesh(geometry1, material1);
     mesh1.position.set( 14, 2, 2 );
 
     let geometry2 = new THREE.SphereGeometry(3, 50, 50);
-    mesh2 = new THREE.Mesh(geometry2, material);
+    let material2 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+    mesh2 = new THREE.Mesh(geometry2, material2);
     mesh2.position.set(7, 2, 2 );
 
-	const coneG = new THREE.ConeGeometry( 3, 10, 32 );
-    let cnMaterial = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-    const cone = new THREE.Mesh( coneG, cnMaterial );
-    cone.position.set( -7 , 2, 2 );
+	let geometry3 = new THREE.ConeGeometry( 3, 10, 32 );
+    let material3 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+    mesh3 = new THREE.Mesh( geometry3, material3 );
+    mesh3.position.set( -7 , 2, 2 );
 
-	const sphere3 = new THREE.SphereGeometry(3, 50, 50);
-    let cnMaterial1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-    const sph3 = new THREE.Mesh( sphere3, cnMaterial1 );
-    cone.position.set( -14 , 2, 2 );
+	const geometry4 = new THREE.SphereGeometry(3, 50, 50);
+    let material4 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+    mesh4 = new THREE.Mesh( geometry4, material4 );
+    mesh4.position.set( -14 , 2, 2 );
 
 
     // SCENE GRAPH
 	const group = new THREE.Group();
-	group.add(mesh);
+	group.add(mesh0);
 	group.add(mesh1);
 	group.add(mesh2);
-	group.add( cone );
-	group.add(sph3);
-	scene.add(group);
+	group.add(mesh3);
+	group.add(mesh4);
     // GUI
     let gui = new dat.GUI();
 
@@ -105,11 +106,11 @@ function init() {
 
 
     //cambiar figura
-    let changeAppearingShape = gui.add(mesh, "visible").name( "Q SE vea ");
+    let changeAppearingShape = gui.add(mesh0, "visible").name( "Q SE vea ");
     let changeAppearingShape1 = gui.add(mesh1, "visible").name( "Q SE vea 1");
     let changeAppearingShape2 = gui.add(mesh2, "visible").name( "Q SE vea 2");
-	  let changeAppearingShape3 = gui.add(cone, "visible").name( "Q SE vea 3");
-	let changeAppearingShape4 = gui.add(sph3, "visible").name( "Q SE vea 4");
+	  let changeAppearingShape3 = gui.add(mesh3, "visible").name( "Q SE vea 3");
+	let changeAppearingShape4 = gui.add(mesh4, "visible").name( "Q SE vea 4");
     generalMenu.open();
 
     // Position Menu
@@ -133,15 +134,15 @@ function init() {
     // Model's Appearance Menu
     let appearMenu = gui.addFolder("Model's Appeareance Menu");
     // Model Draw Mode
-    let chbWireframe = appearMenu.add(mesh.material, "wireframe").setValue(true).name("Wireframe").onChange(function(value) {
+    let chbWireframe = appearMenu.add(mesh.material0, "wireframe").setValue(true).name("Wireframe").onChange(function(value) {
 
     });
     let listColor = appearMenu.add(model, "defaultItem", model.listColors).name("Color List").onChange(function(item) {
-        mesh.material.color = new THREE.Color(item.toLowerCase());
-        model.colorPalette = [mesh.material.color.r * 255, mesh.material.color.g * 255, mesh.material.color.b * 255];
+        mesh.material0.color = new THREE.Color(item.toLowerCase());
+        model.colorPalette = [mesh.material0.color.r * 255, mesh.material0.color.g * 255, mesh.material0.color.b * 255];
     });
     let colorPalette = appearMenu.addColor(model, "colorPalette").name("Color Palette").listen().onChange(function(color) {
-        mesh.material.color = new THREE.Color(color[0]/255, color[1]/255, color[2]/255);
+        mesh.material0.color = new THREE.Color(color[0]/255, color[1]/255, color[2]/255);
     });
 
     // Model's Background
