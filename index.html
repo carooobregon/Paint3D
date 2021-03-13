@@ -57,16 +57,30 @@ function init() {
 
     let geometry1 = new THREE.BoxGeometry();
 	mesh1 = new THREE.Mesh(geometry1, material);
-    mesh1.position.set( 0, 0, 0 );
+    mesh1.position.set( 14, 2, 2 );
 
-    let geometry2 = new THREE.SphereGeometry();
+    let geometry2 = new THREE.SphereGeometry(3, 50, 50);
     mesh2 = new THREE.Mesh(geometry2, material);
     mesh2.position.set(7, 2, 2 );
 
+	const coneG = new THREE.ConeGeometry( 3, 10, 32 );
+    let cnMaterial = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+    const cone = new THREE.Mesh( coneG, cnMaterial );
+    cone.position.set( -7 , 2, 2 );
+
+	const sphere3 = new THREE.SphereGeometry(3, 50, 50);
+    let cnMaterial1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+    const sph3 = new THREE.Mesh( sphere3, cnMaterial1 );
+    cone.position.set( -14 , 2, 2 );
+
+
     // SCENE GRAPH
 	const group = new THREE.Group();
-  group.add(mesh);
+	group.add(mesh);
+	group.add(mesh1);
 	group.add(mesh2);
+	group.add( cone );
+	group.add(sph3);
 	scene.add(group);
     // GUI
     let gui = new dat.GUI();
@@ -83,7 +97,6 @@ function init() {
         listColors,
         defaultItem: listColors[0],
         colorPalette: [255, 255, 255],
-        defaultShape: listShapes[0]
     }
     // view & controller
 
@@ -93,8 +106,10 @@ function init() {
 
     //cambiar figura
     let changeAppearingShape = gui.add(mesh, "visible").name( "Q SE vea ");
+    let changeAppearingShape1 = gui.add(mesh1, "visible").name( "Q SE vea 1");
     let changeAppearingShape2 = gui.add(mesh2, "visible").name( "Q SE vea 2");
-
+	  let changeAppearingShape3 = gui.add(cone, "visible").name( "Q SE vea 3");
+	let changeAppearingShape4 = gui.add(sph3, "visible").name( "Q SE vea 4");
     generalMenu.open();
 
     // Position Menu
