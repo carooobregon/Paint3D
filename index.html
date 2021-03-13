@@ -28,6 +28,7 @@
 
         let renderer, scene, camera, cameraControl, mesh0, mesh1, mesh2, mesh3, mesh4, mesh5, stats;
  
+
 function init() {
     // RENDERER
     renderer = new THREE.WebGLRenderer({antialias: true});
@@ -82,21 +83,35 @@ function init() {
 	group.add(mesh2);
 	group.add(mesh3);
 	group.add(mesh4);
-	
+
 	scene.add(group);
     // GUI
     let gui = new dat.GUI();
 
     // General menu
     let generalMenu = gui.addFolder("General Menu");
+	
+	let listShapes = ["Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5"];
+
+	let model = {
+		listShapes,
+		defaultShape: listShapes[0]
+	}
 
     //cambiar figura
-    let changeAppearingShape = gui.add(mesh0, "visible").name( "Q SE vea ");
-    let changeAppearingShape1 = gui.add(mesh1, "visible").name( "Q SE vea 1");
-    let changeAppearingShape2 = gui.add(mesh2, "visible").name( "Q SE vea 2");
-	let changeAppearingShape3 = gui.add(mesh3, "visible").name( "Q SE vea 3");
-	let changeAppearingShape4 = gui.add(mesh4, "visible").name( "Q SE vea 4");
+    let changeAppearingShape0 = gui.add(mesh0, "visible").name( "Figure 1");
+    let changeAppearingShape1 = gui.add(mesh1, "visible").name( "Figure 2");
+    let changeAppearingShape2 = gui.add(mesh2, "visible").name( "Figure 3");
+    let changeAppearingShape3 = gui.add(mesh3, "visible").name( "Figure 4");
+    let changeAppearingShape4 = gui.add(mesh4, "visible").name( "Figure 5");
     generalMenu.open();
+
+	let listShape = generalMenu.add(model, "defaultShape", model.listShapes).name("Shape List").onChange(function(item) {
+		if(item == "Figure 1"){
+			mesh0.visible = false;
+		}
+	});
+
 
     gui.close();
 
