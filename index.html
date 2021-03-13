@@ -26,30 +26,10 @@
 
   "using strict";
 
-  let renderer, scene, camera, cameraControl, mesh0, mesh1, mesh2, mesh3, mesh4, mesh5, stats;
+  let renderer, scene, camera, cameraControl, stats;
   
- 	function startMenu(cubeMenu, mesh){
-		let listColors = ["White", "Red", "Blue"];
-		let model = {
-			rotY: mesh.rotation.y * 180 / Math.PI,
-			rotX: mesh.rotation.x * 180 / Math.PI,
-			rotZ: mesh.rotation.z * 180 / Math.PI,
-			posHome: function() {
-				mesh.position.x = 0;
-				model.rotY = 0;
-				mesh.rotation.y = model.rotY;
-				mesh.rotation.x = model.rotY;
-				mesh.rotation.z = model.rotZ;
-			},
-			listColors,
-			defaultItem: listColors[0],
-			colorPalette: [255, 255, 255]
-		}
-	}
-
-	function shapeMenu(shapeMenu, mesh, startPos){
+	function shapeMenu(shapeMenu, mesh, startPos, idx){
 		// model
-
 		let listColors = ["White", "Red", "Blue"];
 		let model = {
 			rotY: mesh.rotation.y * 180 / Math.PI,
@@ -57,7 +37,9 @@
 			rotZ: mesh.rotation.z * 180 / Math.PI,
 			posHome: function() {
 				mesh.position.x = startPos;
+        model.rotX = 0;
 				model.rotY = 0;
+        model.rotZ = 0;
 				mesh.rotation.y = model.rotY;
 				mesh.rotation.x = model.rotY;
 				mesh.rotation.z = model.rotZ;
@@ -69,9 +51,10 @@
 		// view & controller
 
 		// General menu
-		// let cubeMenu = gui.addFolder("Cube Controls")
-		let generalMenu = shapeMenu.addFolder("General Menu");
+		let shapeMenuName = "General Menu " + idx
+		let generalMenu = shapeMenu.addFolder(shapeMenuName);
 		// TextField Model Name
+		
 		let tfMeshName = generalMenu.add(mesh, "name").name("Model's Name").onChange(function(value) {
 
 		}).onFinishChange(function(value) {
@@ -80,7 +63,8 @@
 		generalMenu.open();
 
 		// Position Menu
-		let posMenu = shapeMenu.addFolder("Model's Position Menu");
+		let posMenuName = "Position Menu Model" + idx
+		let posMenu = shapeMenu.addFolder(posMenuName);
 		//posMenu.open();
 		//Model Position
 		let sliderPosX = posMenu.add(mesh.position, "x").min(startPos-5).max(startPos+5).step(0.5).name("X").listen().onChange(function(value) {
@@ -95,12 +79,12 @@
 
 		});
 
-
 		// Button Position Home
 		let btnPosHome = posMenu.add(model, "posHome").name("HOME");
 
 		// Rotation Menu
-		let rotMenu = shapeMenu.addFolder("Model's Rotation Menu");
+		let rotMenuName = "Model's Rotation Menu " + idx
+		let rotMenu = shapeMenu.addFolder(rotMenuName);
 		// Model Orientation
 		let sliderRotY = rotMenu.add(model, "rotY").min(-180).max(180).step(5).name("Y (deg)").listen().onChange(function(value) {
 			mesh.rotation.y = value * Math.PI / 180;
@@ -115,7 +99,8 @@
 		});
 
 		// Model's Appearance Menu
-		let appearMenu = shapeMenu.addFolder("Model's Appeareance Menu");
+		let appearMenuName = "Model's Appeareance Menu " + idx;  
+		let appearMenu = shapeMenu.addFolder(appearMenuName);
 		// Model Draw Mode
 		let chbWireframe = appearMenu.add(mesh.material, "wireframe").setValue(true).name("Wireframe").onChange(function(value) {
 			
@@ -127,6 +112,18 @@
 		let colorPalette = appearMenu.addColor(model, "colorPalette").name("Color Palette").listen().onChange(function(color) {
 			mesh.material.color = new THREE.Color(color[0]/255, color[1]/255, color[2]/255);
 		});
+		generalMenu.removeFolder("General Menu");
+	}
+
+	dat.GUI.prototype.removeFolder = function(name) {
+		var folder = this.__folders[name];
+		if (!folder) {
+		return;
+		}
+		folder.close();
+		this.__ul.removeChild(folder.domElement.parentNode);
+		delete this.__folders[name];
+		this.onResize();
 	}
 
 	function init() {
@@ -154,11 +151,11 @@
 		//Cone
 		let geometry0 = new THREE.ConeGeometry();
 		let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-		mesh0 = new THREE.Mesh(geometry0, material0);
+		let mesh0 = new THREE.Mesh(geometry0, material0);
 
 		let geometry1 = new THREE.BoxGeometry();
 		let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
-		mesh1 = new THREE.Mesh(geometry1, material1);
+		let mesh1 = new THREE.Mesh(geometry1, material1);
 		mesh1.position.set( 14, 2, 2 );
 
 		let geometry2 = new THREE.SphereGeometry(3, 50, 50);
@@ -187,28 +184,36 @@
 		scene.add(group);
 		// GUI
 		let gui = new dat.GUI();
-    	let generalMenu = gui.addFolder("General Menu");
-		
+		let myShapesMenu = gui.addFolder("My Shapes");
+		let shapeMenu1 = gui.addFolder("Figure 1 controls");
+		shapeMenu(shapeMenu1, mesh0, 0, 0);
+
+		let shapeMenu2 = gui.addFolder("Figure 2 controls");
+		shapeMenu(shapeMenu2, mesh1, 0, 1);
+
+		let shapeMenu3 = gui.addFolder("Figure 3 controls");
+		shapeMenu(shapeMenu3, mesh2, 0, 0);
+
+		let shapeMenu4 = gui.addFolder("Figure 4 controls");
+		shapeMenu(shapeMenu4, mesh3, 0, 0);
+
+		let shapeMenu5 = gui.addFolder("Figure 5 controls");
+		shapeMenu(shapeMenu5, mesh4, 0, 0);
+
 		let listShapes = ["Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5"];
 
 		let model = {
 			listShapes,
-			defaultShape: listShapes[0]
+			defaultShape: listShapes[0],
+			activeMenu : 0
 		}
 
 		//cambiar figura
-		let changeAppearingShape0 = gui.add(mesh0, "visible").name( "Figure 1");
-		let changeAppearingShape1 = gui.add(mesh1, "visible").name( "Figure 2");
-		let changeAppearingShape2 = gui.add(mesh2, "visible").name( "Figure 3");
-		let changeAppearingShape3 = gui.add(mesh3, "visible").name( "Figure 4");
-		let changeAppearingShape4 = gui.add(mesh4, "visible").name( "Figure 5");
-		generalMenu.open();
-
-		let listShape = generalMenu.add(model, "defaultShape", model.listShapes).name("Shape List").onChange(function(item) {
-			if(item == "Figure 1"){
-				shapeMenu(generalMenu, mesh0, 0);
-			}
-		});
+		let changeAppearingShape0 = myShapesMenu.add(mesh0, "visible").name( "Figure 1");
+		let changeAppearingShape1 = myShapesMenu.add(mesh1, "visible").name( "Figure 2");
+		let changeAppearingShape2 = myShapesMenu.add(mesh2, "visible").name( "Figure 3");
+		let changeAppearingShape3 = myShapesMenu.add(mesh3, "visible").name( "Figure 4");
+		let changeAppearingShape4 = myShapesMenu.add(mesh4, "visible").name( "Figure 5");
 
 
 		gui.close();
