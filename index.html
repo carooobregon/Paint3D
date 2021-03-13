@@ -29,6 +29,7 @@
   let renderer, scene, camera, cameraControl, stats;
   
 	function shapeMenu(shapeMenu, mesh, startPos, idx){
+	idx += 1;
 		// model
 		let listColors = ["White", "Red", "Blue"];
 		let model = {
@@ -36,7 +37,9 @@
 			rotX: mesh.rotation.x * 180 / Math.PI,
 			rotZ: mesh.rotation.z * 180 / Math.PI,
 			posHome: function() {
-				mesh.position.x = startPos;
+				mesh.position.x = startPos[0];
+				mesh.position.y = startPos[1];
+				mesh.position.z = startPos[2];
         model.rotX = 0;
 				model.rotY = 0;
         model.rotZ = 0;
@@ -49,10 +52,13 @@
 			colorPalette: [255, 255, 255]
 		}
 		// view & controller
-
+		
 		// General menu
 		let shapeMenuName = "General Menu " + idx
 		let generalMenu = shapeMenu.addFolder(shapeMenuName);
+		let changeAppearingShape = generalMenu.add(mesh, "visible").name( "Show on screen");
+
+
 		// TextField Model Name
 		
 		let tfMeshName = generalMenu.add(mesh, "name").name("Model's Name").onChange(function(value) {
@@ -60,14 +66,17 @@
 		}).onFinishChange(function(value) {
 			console.log(mesh.name);
 		});
+
+    let btnPosHome = generalMenu.add(model, "posHome").name("RESET POSITIONS");
+
 		generalMenu.open();
 
 		// Position Menu
-		let posMenuName = "Position Menu Model" + idx
+		let posMenuName = "Position Menu Model " + idx
 		let posMenu = shapeMenu.addFolder(posMenuName);
 		//posMenu.open();
 		//Model Position
-		let sliderPosX = posMenu.add(mesh.position, "x").min(startPos-5).max(startPos+5).step(0.5).name("X").listen().onChange(function(value) {
+		let sliderPosX = posMenu.add(mesh.position, "x").min(-5).max(5).step(0.5).name("X").listen().onChange(function(value) {
 
 		});
 
@@ -80,7 +89,6 @@
 		});
 
 		// Button Position Home
-		let btnPosHome = posMenu.add(model, "posHome").name("HOME");
 
 		// Rotation Menu
 		let rotMenuName = "Model's Rotation Menu " + idx
@@ -105,6 +113,11 @@
 		let chbWireframe = appearMenu.add(mesh.material, "wireframe").setValue(true).name("Wireframe").onChange(function(value) {
 			
 		});
+		
+		let opacitySlider = appearMenu.add(mesh.material, "opacity").min(0).max(1).step(0.01).name("Opacity").listen().onChange(function(value) {
+			console.log(value);
+		});
+
 		let listColor = appearMenu.add(model, "defaultItem", model.listColors).name("Color List").onChange(function(item) {
 			mesh.material.color = new THREE.Color(item.toLowerCase());
 			model.colorPalette = [mesh.material.color.r * 255, mesh.material.color.g * 255, mesh.material.color.b * 255];
@@ -112,18 +125,6 @@
 		let colorPalette = appearMenu.addColor(model, "colorPalette").name("Color Palette").listen().onChange(function(color) {
 			mesh.material.color = new THREE.Color(color[0]/255, color[1]/255, color[2]/255);
 		});
-		generalMenu.removeFolder("General Menu");
-	}
-
-	dat.GUI.prototype.removeFolder = function(name) {
-		var folder = this.__folders[name];
-		if (!folder) {
-		return;
-		}
-		folder.close();
-		this.__ul.removeChild(folder.domElement.parentNode);
-		delete this.__folders[name];
-		this.onResize();
 	}
 
 	function init() {
@@ -146,32 +147,38 @@
 		cameraControl = new OrbitControls(camera, renderer.domElement);
 
 		let isVisible = true;
-
+		let startPos = [0, 0, 0]
 		//MESH MODELS
 		//Cone
 		let geometry0 = new THREE.ConeGeometry();
-		let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		let mesh0 = new THREE.Mesh(geometry0, material0);
+		let startPos0 = [0, 0, 0]
+		mesh0.position.set(startPos0[0], startPos0[1], startPos0[2]);
 
 		let geometry1 = new THREE.BoxGeometry();
-		let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		let mesh1 = new THREE.Mesh(geometry1, material1);
-		mesh1.position.set( 14, 2, 2 );
+		let startPos1 = [14, 2, 2];
+		mesh1.position.set( startPos1[0], startPos1[1], startPos1[2] );
 
 		let geometry2 = new THREE.SphereGeometry(3, 50, 50);
-		let material2 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		let material2 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		const mesh2 = new THREE.Mesh(geometry2, material2);
-		mesh2.position.set(7, 2, 2 );
-
+		let startPos2 = [7, 2, 2];
+		mesh2.position.set( startPos2[0], startPos2[1], startPos2[2]);
+		
 		let geometry3 = new THREE.ConeGeometry( 3, 10, 32 );
-		let material3 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		let material3 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		const mesh3 = new THREE.Mesh(geometry3, material3 );
-		mesh3.position.set( -7 , 2, 2 );
+	  let startPos3 = [-7, 2, 2];
+		mesh3.position.set( startPos3[0], startPos3[1], startPos3[2]);
 
 		const geometry4 = new THREE.SphereGeometry(3, 50, 50);
-		let material4 = new THREE.MeshBasicMaterial({color: "white", wireframe: true});
+		let material4 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		const mesh4 = new THREE.Mesh(geometry4, material4 );
-		mesh4.position.set( -14 , 2, 2 );
+		let startPos4 = [-14, 2, 2];
+		mesh4.position.set(startPos4[0], startPos4[1], startPos4[2]);
 
 		// SCENE GRAPH
 		const group = new THREE.Group();
@@ -186,19 +193,19 @@
 		let gui = new dat.GUI();
 		let myShapesMenu = gui.addFolder("My Shapes");
 		let shapeMenu1 = gui.addFolder("Figure 1 controls");
-		shapeMenu(shapeMenu1, mesh0, 0, 0);
+		shapeMenu(shapeMenu1, mesh0, startPos0, 0);
 
 		let shapeMenu2 = gui.addFolder("Figure 2 controls");
-		shapeMenu(shapeMenu2, mesh1, 0, 1);
+		shapeMenu(shapeMenu2, mesh1, startPos1, 1);
 
 		let shapeMenu3 = gui.addFolder("Figure 3 controls");
-		shapeMenu(shapeMenu3, mesh2, 0, 0);
+		shapeMenu(shapeMenu3, mesh2, startPos2, 2);
 
 		let shapeMenu4 = gui.addFolder("Figure 4 controls");
-		shapeMenu(shapeMenu4, mesh3, 0, 0);
+		shapeMenu(shapeMenu4, mesh3, startPos3, 3);
 
 		let shapeMenu5 = gui.addFolder("Figure 5 controls");
-		shapeMenu(shapeMenu5, mesh4, 0, 0);
+		shapeMenu(shapeMenu5, mesh4, startPos4, 4);
 
 		let listShapes = ["Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5"];
 
