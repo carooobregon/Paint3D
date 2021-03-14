@@ -13,6 +13,7 @@
         overflow: hidden;
     }
     </style>
+    <link rel="stylesheet" href="style.css">
     <title>Document</title>
 </head>
 <body>
@@ -29,7 +30,7 @@
   let renderer, scene, camera, cameraControl, stats;
   
 	function shapeMenu(shapeMenu, mesh, startPos, idx){
-	idx += 1;
+		idx += 1;
 		// model
 		let listColors = ["White", "Red", "Blue"];
 		let model = {
@@ -57,7 +58,6 @@
 		let shapeMenuName = "General Menu " + idx
 		let generalMenu = shapeMenu.addFolder(shapeMenuName);
 		let changeAppearingShape = generalMenu.add(mesh, "visible").name( "Show on screen");
-
 
 		// TextField Model Name
 		
@@ -136,6 +136,10 @@
 
 		// SCENE
 		scene = new THREE.Scene();
+		//PLANO Z
+		const geometryScene = new THREE.PlaneGeometry( 1,  1, 1 );
+		const materialScene = new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.DoubleSide} );
+		const planeZ =  new THREE.Mesh(geometryScene);
 
 		// CAMERA
 		let fov = 60;
@@ -146,39 +150,276 @@
 		camera.position.set(0, 0, 3);
 		cameraControl = new OrbitControls(camera, renderer.domElement);
 
+		// STATS
+		stats = new Stats();
+    stats.domElement.height = '48px';
+    [].forEach.call(stats.domElement.children, (child) => (child.style.display = ''));
+
+		stats.showPanel(0);
+		document.body.appendChild(stats.dom);
+
 		let isVisible = true;
 		let startPos = [0, 0, 0]
+
 		//MESH MODELS
-		//Cone
-		let geometry0 = new THREE.ConeGeometry();
+		
+
+		// Figura 1 = Piramide 
+		var pts = [
+		new THREE.Vector3(0.5, 0.5, 0.5),
+		new THREE.Vector3(0, 0, 0),
+		new THREE.Vector3(0, 0, 1),
+		new THREE.Vector3(1, 0, 1),
+		new THREE.Vector3(1, 0, 0)
+		];
+
+		const geometry0 = new THREE.BufferGeometry().setFromPoints(pts);
+		geometry0.setIndex([
+		0, 1, 4,
+		0, 2, 1, 
+		0, 3, 4,
+		0, 4, 1,
+		1, 3, 2,
+		1, 4, 3
+		]);
+		geometry0.computeVertexNormals();
 		let material0 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		let mesh0 = new THREE.Mesh(geometry0, material0);
 		let startPos0 = [0, 0, 0]
 		mesh0.position.set(startPos0[0], startPos0[1], startPos0[2]);
 
-		let geometry1 = new THREE.BoxGeometry();
+
+		// Figura 2 = Molde de corazon 
+		const outline = new THREE.Shape([
+		[ -2, -0.1], [  2, -0.1], [ 2,  0.6],
+		[1.6,  0.6], [1.6,  0.1], [-2,  0.1],
+		].map(p => new THREE.Vector2(...p)));
+
+		const x = -2.5;
+		const y = -5;
+		const shape = new THREE.CurvePath();
+		const points = [
+		[x + 2.5, y + 2.5],
+		[x + 2.5, y + 2.5], [x + 2,   y      ], [x,       y      ],
+		[x - 3,   y      ], [x - 3,   y + 3.5], [x - 3,   y + 3.5],
+		[x - 3,   y + 5.5], [x - 1.5, y + 7.7], [x + 2.5, y + 9.5],
+		[x + 6,   y + 7.7], [x + 8,   y + 4.5], [x + 8,   y + 3.5],
+		[x + 8,   y + 3.5], [x + 8,   y      ], [x + 5,   y      ],
+		[x + 3.5, y      ], [x + 2.5, y + 2.5], [x + 2.5, y + 2.5],
+		].map(p => new THREE.Vector3(...p, 0));
+		for (let i = 0; i < points.length; i += 3) {
+		shape.add(new THREE.CubicBezierCurve3(...points.slice(i, i + 4)));
+		}
+
+		const extrudeSettings = {
+		steps: 100,  
+		bevelEnabled: false,
+		extrudePath: shape,
+		};
+
+		const geometry1 =  new THREE.ExtrudeGeometry(outline, extrudeSettings);
 		let material1 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		let mesh1 = new THREE.Mesh(geometry1, material1);
-		let startPos1 = [14, 2, 2];
+		let startPos1 = [14, 1, 5];
 		mesh1.position.set( startPos1[0], startPos1[1], startPos1[2] );
 
-		let geometry2 = new THREE.SphereGeometry(3, 50, 50);
+
+		// Figura 3 = Corazon completo 
+		const shapeHeart= new THREE.Shape();
+		const x1 = -2.5;
+		const y1 = -5;
+		shapeHeart.bezierCurveTo(x1 + 2.5, y1 + 2.5, x1 + 2, y1, x1, y1);
+		shapeHeart.bezierCurveTo(x1 - 3, y1, x1 - 3, y1 + 3.5, x1 - 3, y1 + 3.5);
+		shapeHeart.bezierCurveTo(x1 - 3, y1 + 5.5, x1 - 1.5, y1 + 7.7, x1 + 2.5, y1 + 9.5);
+		shapeHeart.bezierCurveTo(x1 + 6, y1 + 7.7, x1 + 8, y1 + 4.5, x1 + 8, y1 + 3.5);
+		shapeHeart.bezierCurveTo(x1+ 8, y1 + 3.5, x1 + 8, y1, x1 + 5, y1);
+		shapeHeart.bezierCurveTo(x1 + 3.5, y1, x1 + 2.5, y1 + 2.5, x1 + 2.5, y1 + 2.5);
+
+		const extrudeSettings1 = {
+		steps:   1,  
+		depth:  1.0,  
+		bevelEnabled: true,  
+		bevelThickness: 0.88,  
+		bevelSize: 2.42,  
+		bevelSegments: 2,  
+		};
+		const geometry2 = new THREE.ExtrudeGeometry(shapeHeart, extrudeSettings1);
 		let material2 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		const mesh2 = new THREE.Mesh(geometry2, material2);
-		let startPos2 = [7, 2, 2];
+		let startPos2 = [20, 20, 2];
 		mesh2.position.set( startPos2[0], startPos2[1], startPos2[2]);
-		
-		let geometry3 = new THREE.ConeGeometry( 3, 10, 32 );
+
+
+
+		//Figura 4 = Random
+	
+		var pts = [
+		new THREE.Vector3(2, 1, 0.5),
+		new THREE.Vector3(0, 0, 0),
+		new THREE.Vector3(0, 0, 2),
+		new THREE.Vector3(3, 0, 1),
+		new THREE.Vector3(1, 0, 0)
+		];
+
+		const geometry3 = new THREE.BufferGeometry().setFromPoints(pts);
+		geometry3.setIndex([
+		0, 1, 4,
+		0, 2, 1, 
+		0, 3, 4,
+		0, 4, 1,
+		1, 3, 2,
+		1, 4, 3
+		]);
+		geometry3.computeVertexNormals();
 		let material3 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		const mesh3 = new THREE.Mesh(geometry3, material3 );
-	  let startPos3 = [-7, 2, 2];
+	 	let startPos3 = [-7, 2, 2];
 		mesh3.position.set( startPos3[0], startPos3[1], startPos3[2]);
 
-		const geometry4 = new THREE.SphereGeometry(3, 50, 50);
+
+		//Figure 5 = Random 
+		
+		var pts = [
+		new THREE.Vector3(2, 1, 0.5),
+		new THREE.Vector3(0, 0, 0),
+		new THREE.Vector3(4, 0, 2),
+		new THREE.Vector3(3, 4, 1),
+		new THREE.Vector3(1, 0, 0)
+		];
+
+		const geometry4 = new THREE.BufferGeometry().setFromPoints(pts);
+		geometry4.setIndex([
+		0, 1, 4,
+		0, 2, 1, 
+		0, 3, 4,
+		0, 4, 1,
+		1, 3, 2,
+		1, 4, 3
+		]);
+		geometry4.computeVertexNormals();
 		let material4 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
 		const mesh4 = new THREE.Mesh(geometry4, material4 );
-		let startPos4 = [-14, 2, 2];
-		mesh4.position.set(startPos4[0], startPos4[1], startPos4[2]);
+	 	let startPos4 = [2, 4, 3];
+		mesh4.position.set( startPos4[0], startPos4[1], startPos4[2]);
+		
+
+		// Figura 6 = Random 
+		var pts = [
+		new THREE.Vector3(2, 1, 0.5),
+		new THREE.Vector3(0, 2, 0),
+		new THREE.Vector3(1, 0, 5),
+		new THREE.Vector3(1, 0, 5),
+		new THREE.Vector3(1, 0, 5),
+		];
+
+		const geometry5 = new THREE.BufferGeometry().setFromPoints(pts);
+		geometry5.setIndex([
+		0, 1, 4,
+		0, 2, 1, 
+		0, 3, 4,
+		0, 4, 1,
+		1, 3, 2,
+		1, 4, 3
+		]);
+		geometry5.computeVertexNormals();
+		let material5 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
+		const mesh5 = new THREE.Mesh(geometry5, material5 );
+		let startPos5 = [-10, 9, 2];
+		mesh5.position.set(startPos5[0], startPos5[1], startPos5[2]);
+
+		//Figura 7 = Random
+		var pts = [
+		new THREE.Vector3(2, 1, 10),
+		new THREE.Vector3(0, 3, 0),
+		new THREE.Vector3(1,8, 10),
+		new THREE.Vector3(10, 2, 10),
+		new THREE.Vector3(1, 0, 4),
+		];
+
+		const geometry6 = new THREE.BufferGeometry().setFromPoints(pts);
+		geometry6.setIndex([
+		0, 1, 4,
+		0, 2, 1, 
+
+		]);
+		geometry6.computeVertexNormals();
+		let material6 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
+		const mesh6 = new THREE.Mesh(geometry6, material6 );
+		let startPos6 = [-7, 9, 3];
+		mesh6.position.set(startPos6[0], startPos6[1], startPos6[2]);
+
+		//Figura 8 = Random
+		var pts = [
+		new THREE.Vector3(2, 1, 9),
+		new THREE.Vector3(3, 2, 7),
+		new THREE.Vector3(1, 0, 8),
+		new THREE.Vector3(9, 6, 0),
+		new THREE.Vector3(1, 4, 2)
+		];
+
+		const geometry7 = new THREE.BufferGeometry().setFromPoints(pts);
+		geometry7.setIndex([
+		0, 1, 4,
+		0, 2, 1, 
+		0, 3, 4,
+		0, 4, 1,
+		1, 3, 2,
+		1, 4, 3
+		]);
+		geometry7.computeVertexNormals();
+		let material7 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
+		const mesh7 = new THREE.Mesh(geometry7, material7 );
+		let startPos7 = [8, 3, 8];
+		mesh7.position.set(startPos7[0], startPos7[1], startPos7[2]);
+
+		//Figura 9
+		var pts = [
+		new THREE.Vector3(2, 1, 8),
+		new THREE.Vector3(0, 2, 5),
+		new THREE.Vector3(1, 0, 5),
+		new THREE.Vector3(3, 2, 0),
+		new THREE.Vector3(1, 0, 9)
+		];
+
+		const geometry8 = new THREE.BufferGeometry().setFromPoints(pts);
+		geometry8.setIndex([
+		0, 1, 4,
+		0, 2, 1, 
+		0, 3, 4,
+		0, 4, 1,
+		1, 3, 2,
+		1, 4, 3
+		]);
+		geometry8.computeVertexNormals();
+		let material8 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
+		const mesh8 = new THREE.Mesh(geometry8, material8 );
+		let startPos8 = [4, 8, 12];
+		mesh8.position.set(startPos8[0], startPos8[1], startPos8[2]);
+
+		//Figura 10
+		var pts = [
+		new THREE.Vector3(2, 1, 0.5),
+		new THREE.Vector3(0, 2, 0),
+		new THREE.Vector3(6, 0, 5),
+		new THREE.Vector3(0, 6, 0),
+		new THREE.Vector3(1, 0, 6)
+		];
+
+		const geometry9 = new THREE.BufferGeometry().setFromPoints(pts);
+		geometry9.setIndex([
+		0, 1, 4,
+		0, 2, 1, 
+		0, 3, 4,
+		0, 4, 1,
+		1, 3, 2,
+		1, 4, 3
+		]);
+		geometry9.computeVertexNormals();
+		let material9 = new THREE.MeshBasicMaterial({color: "white", wireframe: true, transparent: true});
+		const mesh9 = new THREE.Mesh(geometry9, material9 );
+		let startPos9 = [-11, 6, 10];
+		mesh9.position.set(startPos9[0], startPos9[1], startPos9[2]);
+
 
 		// SCENE GRAPH
 		const group = new THREE.Group();
@@ -187,10 +428,16 @@
 		group.add(mesh2);
 		group.add(mesh3);
 		group.add(mesh4);
+		group.add(mesh5);
+		group.add(mesh6);
+		group.add(mesh7);
+		group.add(mesh8);
+		group.add(mesh9);
 
 		scene.add(group);
 		// GUI
 		let gui = new dat.GUI();
+
 		let myShapesMenu = gui.addFolder("My Shapes");
 		let shapeMenu1 = gui.addFolder("Figure 1 controls");
 		shapeMenu(shapeMenu1, mesh0, startPos0, 0);
@@ -207,28 +454,67 @@
 		let shapeMenu5 = gui.addFolder("Figure 5 controls");
 		shapeMenu(shapeMenu5, mesh4, startPos4, 4);
 
-		let listShapes = ["Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5"];
+		let shapeMenu6 = gui.addFolder("Figure 6 controls");
+		shapeMenu(shapeMenu6, mesh5, startPos5, 5);
+
+		let shapeMenu7 = gui.addFolder("Figure 7 controls");
+		shapeMenu(shapeMenu7, mesh6, startPos6, 6);
+
+		let shapeMenu8 = gui.addFolder("Figure 8 controls");
+		shapeMenu(shapeMenu8, mesh7, startPos6, 7);
+
+		let shapeMenu9 = gui.addFolder("Figure 9 controls");
+		shapeMenu(shapeMenu9, mesh8, startPos6, 8);
+
+		let shapeMenu10 = gui.addFolder("Figure 10 controls");
+		shapeMenu(shapeMenu10, mesh9, startPos6, 9);
+
+    var perfFolder = gui.addFolder("Show/hide stats");
+    var perfLi = document.createElement("li");
+    stats.domElement.style.position = "static";
+    perfLi.appendChild(stats.domElement);
+    perfLi.classList.add("gui-stats");
+    perfFolder.__ul.appendChild(perfLi);
+
+
+		let listShapes = ["Figure 1", "Figure 2", "Figure 3", "Figure 4", "Figure 5","Figure 6","Figure 7","Figure 8","Figure 9","Figure 10"];
 
 		let model = {
 			listShapes,
 			defaultShape: listShapes[0],
-			activeMenu : 0
+			activeMenu : 0,
+			colorPalette: [255, 255, 255],
+			showStats : true
 		}
 
+ // Scene Menu
+    // Model's Bakground
+    let changeColorBack = gui.addFolder("Model's Background Color");
+    let colorBackground = changeColorBack.addColor(model, "colorPalette").name("Color Palette").listen().onChange(function(color) {
+        renderer.setClearColor(new THREE.Color(color[0]/255, color[1]/255, color[2]/255));
+    //renderer.setClearColor(new THREE.Color(0.2, 0.24, 0.30));
+    });
+    
+
+    //Model's Plane z=0
+		let modelsPlane = gui.addFolder("Model's Plane");
+		scene.add(planeZ)
+		let showPlane = modelsPlane.add(planeZ, "visible").name( "Plane Z");		
 		//cambiar figura
 		let changeAppearingShape0 = myShapesMenu.add(mesh0, "visible").name( "Figure 1");
 		let changeAppearingShape1 = myShapesMenu.add(mesh1, "visible").name( "Figure 2");
 		let changeAppearingShape2 = myShapesMenu.add(mesh2, "visible").name( "Figure 3");
 		let changeAppearingShape3 = myShapesMenu.add(mesh3, "visible").name( "Figure 4");
 		let changeAppearingShape4 = myShapesMenu.add(mesh4, "visible").name( "Figure 5");
+		let changeAppearingShape5 = myShapesMenu.add(mesh5, "visible").name( "Figure 6");
+		let changeAppearingShape6 = myShapesMenu.add(mesh6, "visible").name( "Figure 7");
+		let changeAppearingShape7 = myShapesMenu.add(mesh7, "visible").name( "Figure 8");
+		let changeAppearingShape8 = myShapesMenu.add(mesh8, "visible").name( "Figure 9");
+		let changeAppearingShape9 = myShapesMenu.add(mesh9, "visible").name( "Figure 10");
+
 
 
 		gui.close();
-
-		// STATS
-		stats = new Stats();
-		stats.showPanel(0);
-		document.body.appendChild(stats.dom);
 
 		// RENDER LOOP
 		renderLoop();
